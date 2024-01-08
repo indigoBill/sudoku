@@ -1,0 +1,13 @@
+.uiSquare {
+    height: 30px;
+    width: 30px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.uiBoard {
+    display: grid;
+    grid-template: repeat(9, min-content) / repeat(9, min-content);
+}
