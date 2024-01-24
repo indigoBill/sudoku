@@ -19,7 +19,7 @@ function generateBoard(){
 
         /*
         if(givensAdded !== numOfGivens){
-            boardSquare = getRandomPlayableNum();
+            boardSquare = generateRandomPlayableNum();
             uiSquare.textContent = boardSquare;
             givensAdded++;
         }
@@ -37,16 +37,55 @@ function generateBoard(){
     });
 }
 
-generateBoard();
+function addGivensToBoard(numOfGivens){
+    //USE sections TO ADD GIVENS TO BOARD AT RANDOM AREAS AS OPPOSED TO LOADING THEM W/O ANY RULE CHECKING (LINES 21 - 25)
 
-//USE SUB ARRAYS TO TRACK FORMATS
-//const squares = [[subarray of boardSquare indexes that make up the boxes][another subarray][and so on...]]
-//const rows = [[],[]]
-//const columns = [[],[]]
+    let givensAdded = 0;
+
+    while(givensAdded <= numOfGivens){
+        let boardPosition = getRandomBoardPosition();
+
+        checkBoardPosition(boardPosition);
+
+        givensAdded++;
+    }
+}
+
+function getRandomBoardPosition(){
+    const HIGHEST_BOARD_POSITION = 80;
+    const LOWEST_BOARD_POSITION = 0;
+
+    let randBoardPosition = Math.floor(Math.random() * (HIGHEST_BOARD_POSITION - LOWEST_BOARD_POSITION + 1)) + LOWEST_BOARD_POSITION;
+
+    return randBoardPosition;
+}
+
+function checkBoardPosition(randPosition){
+    
+}
+
+function getLevel(){
+    let selectedLevel = prompt('SELECT LEVEL: EASY, MEDIUM, HARD').toUpperCase();
+
+    const levels = ['EASY','MEDIUM','HARD'];
+
+    if(levels.contains(selectedLevel)){
+        return selectedLevel;
+    }
+
+    return;
+}
+
+function playGame(){
+    generateBoard();
+    let numOfGivens = generateNumOfGivens(getLevel());
+    addGivensToBoard(numOfGivens);
+}
 
 function generateNumOfGivens(level){
     let minGivens;
     let maxGivens;
+    let numOfGivens;
 
     if(level === 'EASY'){
         //numOfGivens bet. 69 - 77
@@ -57,56 +96,124 @@ function generateNumOfGivens(level){
         minGivens = 43;
         maxGivens = 68;
 
-    }else{
+    }else if(level === 'HARD'){
         //numOfGivens bet. 17 - 42
         minGivens = 17;
         maxGivens = 42;
     }
 
-    let numOfGivens = Math.floor(Math.random() * (maxGivens - minGivens + 1)) + minGivens;
+    numOfGivens = Math.floor(Math.random() * (maxGivens - minGivens + 1)) + minGivens;
     console.log(numOfGivens);
 
     return numOfGivens;
 }
 
-function createFormats(){
-    const rowsArr = [];
-    const columnsArr = [];
-    const boxesArr = [];
+const sections = (function(){
+    const allRowSections = [];
+    const allColSections = [];
+    const allBoxSections = [];
+    const MAX_ARR_LENGTH = 9;
 
-    let indexCounter = 0;
-    let maxLength = 9;
+    function generateRowSections(){
+        const largestFirstElementInRowArr = 72;
+
+        for(let firstElementInRowArr = 0; firstElementInRowArr <= largestFirstElementInRowArr; firstElementInRowArr+=9){
+
+            const rowArr = [];
+            let result = firstElementInRowArr;
     
-    //UPDATE WHEN boardArray BECOMES ACCESSIBLE TO THIS FUNCTION
-    //  for(let i = 0; i <= boardArray.length; i++)
-    for(let i = 0; i <= 80; i++){
-
-        const row = [];
-        const column = [];
-        const box = [];
-
-        if(indexCounter < maxLength){
-            
-            row.push(i);
-            column.push()
-
-
-            indexCounter++;
-        }else{
-            indexCounter = 0;
-            row.length = 0;
-            column.length = 0;
-            box.length = 0;
+            while(rowArr.length < MAX_ARR_LENGTH){
+    
+                if(!(rowArr.includes(firstElementInRowArr))){
+                    rowArr.push(firstElementInRowArr);
+                }else{
+    
+                    result++;
+                    rowArr.push(result);
+                }
+            }
+    
+            allRowSections.push(rowArr);
         }
     }
-}
 
-function getFormats(){
+    function generateColSections(){   
+        const largestFirstElementInColArr = 9;
 
-}
+        for(let firstElementInColArr = 0; firstElementInColArr < largestFirstElementInColArr; firstElementInColArr++){
+
+            const columnArr = [];
+            let result = firstElementInColArr;
+            const INCREMENTOR = 9;
+
+            while(columnArr.length < MAX_ARR_LENGTH){
+
+                if(!(columnArr.includes(firstElementInColArr))){
+                    columnArr.push(firstElementInColArr);
+                }else{
+
+                    result += INCREMENTOR;
+                    columnArr.push(result);
+                }
+            }
+            allColSections.push(columnArr);
+        } 
+    }
+
+    function generateBoxSections(){
+        const largestFirstElementInBoxArr = 60;
+
+        for(let firstElementInBoxArr = 0; firstElementInBoxArr <= largestFirstElementInBoxArr; ){
+
+            const boxArr = [];
+            let mainIncrementor;
+            let result = firstElementInBoxArr;
+            const MAX_BOXES_IN_A_BOX_ROW = 3;
+            const INCREMENTOR = 7;
+            const MAX_BOXES_IN_A_GRID_ROW = 3;
+    
+            while(boxArr.length < MAX_ARR_LENGTH){
+    
+                boxArr.push(result);
+    
+                if(boxArr.length % MAX_BOXES_IN_A_BOX_ROW === 0){
+                    result+=INCREMENTOR;
+                }else{
+                    result++;
+                }
+            }
+            allBoxSections.push(boxArr);
+            
+            if(allBoxSections.length % MAX_BOXES_IN_A_GRID_ROW === 0){
+                mainIncrementor = 21;
+            }else{
+                mainIncrementor = 3;
+            }
+    
+            firstElementInBoxArr+=mainIncrementor;
+        }
+    }
+
+    generateRowSections();
+    generateColSections();
+    generateBoxSections();
+
+    function getAllSections(){
+        console.log([allRowSections, allColSections, allBoxSections]);
+        return [allRowSections, allColSections, allBoxSections];
+    }
+
+    return { getAllSections };
+})();
+
+sections.getAllSections();
+
+//NOT GOOD CODE TO HAVE IT RANDOMLY GENERATE NUMS IT WASTES TIME INSTEAD BUILD A SYSTEM THAT CHECKS THE 
+//ROWS COLS AND BOXES AND RETRIEVES THE POSSIBLE PLAYABLE NUMS
+//USE THIS SYSTEM TO FILL THE BOARD W/ GIVENS
 
 //GENERATE RAND NUM BETWEEN 1 & 9 INCLUSIVE
-function getRandomPlayableNum(){
+function generateRandomPlayableNum(){
     const SMALLEST_PLAYABLE_NUM = 1;
     const LARGEST_PLAYABLE_NUM = 9;
 
@@ -114,3 +221,4 @@ function getRandomPlayableNum(){
 
     return playableNum;
 }
+
